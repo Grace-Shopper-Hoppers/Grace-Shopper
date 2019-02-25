@@ -3,12 +3,6 @@ import { connect } from 'react-redux'
 import {Link} from 'react-router-dom'
 import { Redirect } from 'react-router-dom'
 import { withRouter } from "react-router-dom";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-import SvgIcon from '@material-ui/core/SvgIcon';
-import Glass from '@material-ui/icons/Search';
-
 
 
 class Search extends Component {
@@ -38,27 +32,20 @@ class Search extends Component {
     }
 
     render(){
-      return (
-        <div>
-
-          <div className="box-1">
-            <div className="container-1">
+        return(
+          <div>
             <form id='search-products' onSubmit={this.handleSubmit}>
-            <FontAwesomeIcon icon={faSearch} className="icon" style={{ color: 'rgb(165, 165, 165)'}}/>
-              <input type="search" id="search-1" placeholder="Search . . ." value={this.state.value} onChange={this.handleChange} />
+                <input type="text" value={this.state.value} onChange={this.handleChange} />
+                <button type='submit'>Go!</button>
             </form>
-            </div>
-          </div>
-
-
             <div>
               {
                 this.state.products && this.state.products.map(product => {
                   return (
                     <div key={product.id}>
-                      <li><Link to={`/products/${product.id}`}> {product.title}</Link></li>
-                      <img src={product.imageUrl} alt="" className="img-responsive" />
-                      <div >
+                    <li><Link to={`/products/${product.id}`}> {product.title}</Link></li>
+                    <img src={product.imageUrl} alt="" className="img-responsive" />
+                    <div >
                       <p>${product.price}</p>
                     </div>
                     <form id='add-button' onSubmit={this.handleSubmit}>
@@ -73,6 +60,7 @@ class Search extends Component {
               }
             </div>
           </div>
+
         )
     }
 }

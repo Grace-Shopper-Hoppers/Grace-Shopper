@@ -2,8 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import {Link} from 'react-router-dom'
 import { gotAllCategories } from '../store/category'
-import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 class Categories extends Component {
   constructor(){
@@ -32,21 +30,18 @@ class Categories extends Component {
   }
   render() {
     const categories = this.props.categories
-    console.log('cat', categories);
-
     const categoryMenu = categories[0] && categories.map(category => {
       return (
           <div key={category.id}>
-          <Link className="ind-categories"  to={`/categories/${category.id}`}> {category.content}</Link>
+          <button><Link to={`/categories/${category.id}`}> {category.content}</Link></button>
           </div>
       )
     })
 
     return (
-      <div className="dropdown">
-        <button id="categories" onClick={this.showMenu}>
+      <div>
+        <button onClick={this.showMenu}>
          Categories
-        <FontAwesomeIcon icon={faCaretDown} style={{ color: 'rgb(165, 165, 165)', marginLeft: '5px'}} />
         </button>
         {
           this.state.showMenu
@@ -57,14 +52,14 @@ class Categories extends Component {
                 this.dropdownMenu = element;
               }}
               >
-              {categoryMenu}
-              </div>
+              {categoryMenu} 
+              </div> 
             )
             : (
               null
             )
 
-
+            
         }
       </div>
     );
