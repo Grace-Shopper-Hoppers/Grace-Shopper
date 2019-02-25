@@ -6,7 +6,6 @@ import { gotAllOrders, deleteFromCart, changeQuantity, getNewPrice, applyPromo }
 import { me } from '../store/user'
 import CartItems from './cartItems'
 import PromoCode from './promoCode'
-import Checkout from './checkout'
 
 class Cart extends Component {
   constructor() {
@@ -51,7 +50,6 @@ class Cart extends Component {
   }
 
   handleChange(evt) {
-    console.log('HANDLECHANGE')
     const productId = Number(evt.target.value);
     const PlusOrMinus = evt.target.name;
     const [orderProductInLocalState] = this.state.orderProduct.filter(product => product.id === productId);
@@ -79,15 +77,8 @@ class Cart extends Component {
         }
       })
 
-      let myTotal = newState.reduce((sumTotal, orderProduct) => {
-        let productTotal = orderProduct.quantity * orderProduct.price
-        return sumTotal + productTotal
-      }, 0)
-      myTotal = ((myTotal) / 100).toFixed(2)
-      console.log('myTotla', myTotal)
       this.setState({
-        orderProduct: newState,
-        myTotal
+        orderProduct: newState
       })
     } else {
       PlusOrMinus === 'increment'
@@ -101,50 +92,35 @@ class Cart extends Component {
         }
       })
       sessionStorage.setItem('orderProduct', JSON.stringify(newState))
-      console.log('NEW STATE', newState)
-      let myTotal = newState.reduce((sumTotal, orderProduct) => {
-        let productTotal = orderProduct.quantity * orderProduct.price
-        return sumTotal + productTotal
-      }, 0)
-      myTotal = ((myTotal) / 100).toFixed(2)
-      console.log('myTotal', myTotal)
       this.setState({
-        orderProduct: newState,
-        myTotal
+        orderProduct: newState
       })
     }
   }
 
   handlePromoSubmit(e){
     e.preventDefault()
-
-    console.log('orderId', this.state.myTotal)
     const promoCode = e.target.promoCode.value
-    if(promoCode === 'SCENTEDSHOPPER'){
+    if(promoCode === 'Luigi50'){
+      this.setState({promoCode})
 
-
-      const newTotal = this.total(promoCode);
-      console.log('newTotal', newTotal)
+      const newTotal = this.total(promoCode)
       if(this.props.order){
         const applyPromoObj = {
           newTotal,
           orderId: Number(this.props.order.id),
           promoCode
         }
-        // console.log('applyPromOb', this.props.user.id)
-
-        this.state.orderId && this.props.applyPromo(applyPromoObj)
-        this.setState({promoCode, myTotal: newTotal})
+        this.props.applyPromo(applyPromoObj)
       }
     }
   }
 
   handleSubmit(evt) {
-    console.log('hS - for checkout', evt.target.name)
     evt.preventDefault()
     const productId = Number(evt.target.name);
-    console.log('prodI', productId)
     const userId = Number(this.props.user.id)
+
     if (this.props.user.id) {
       const infoForDelete = { productId, userId }
       this.props.deleteFromCart(infoForDelete)
@@ -152,21 +128,13 @@ class Cart extends Component {
       this.props.history.push('/cart/')
     } else {
       const orderProductSession = JSON.parse(sessionStorage.getItem('orderProduct'));
-      console.log('HS orderProductSession', orderProductSession)
       let newOrderProductSession = orderProductSession.filter(prod => prod.id !== productId)
       sessionStorage.setItem('orderProduct', JSON.stringify(newOrderProductSession))
-
-      let myTotal = newOrderProductSession.reduce((sumTotal, orderProduct) => {
-        let productTotal = orderProduct.quantity * orderProduct.price
-        return sumTotal + productTotal
-      }, 0)
-      myTotal = ((myTotal) / 100).toFixed(2)
-      this.setState({ orderProduct: newOrderProductSession, myTotal })
+      this.setState({ orderProduct: newOrderProductSession })
     }
   }
 
   total(promo) {
-    console.log('TOTAL')
     const orderProducts = this.props.user.id ? this.props.order.products : this.state.orderProduct
     let total;
     if (orderProducts) {
@@ -181,8 +149,7 @@ class Cart extends Component {
       }, 0)
     }
     total = ((total) / 100).toFixed(2)
-    console.log('scented - total', total)
-    if(promo === 'SCENTEDSHOPPER' || this.state.promoCode === 'SCENTEDSHOPPER') {
+    if(promo === 'Luigi50' || this.state.promoCode === 'Luigi50') {
       return (total/2).toFixed(2)
     } else {
       return total ? total : 0
@@ -191,7 +158,6 @@ class Cart extends Component {
 
   render() {
     console.log("OUR OURDERRRR ID", this.props.order)
-    console.log('STATE TOTAL', this.state.myTotal)
     if (this.props.user.id && this.props.order) {
       return (
         <div className='shopping-cart'>
@@ -200,7 +166,7 @@ class Cart extends Component {
           </div>
          {
           this.state.promoCode &&
-          <div id="promoApplied">
+          <div>
             <h2>Promo Code Applied: {this.state.promoCode}</h2>
           </div>
          }
@@ -226,13 +192,12 @@ class Cart extends Component {
     } else {
       return (
         <div className='shopping-cart'>
-          <div className="cartItems">
           <div className='title'>
             <h2>Shopping Cart</h2>
           </div>
           {
           this.state.promoCode &&
-          <div id="promoApplied">
+          <div>
             <h2>Promo Code Applied: {this.state.promoCode}</h2>
           </div>
          }
@@ -242,18 +207,11 @@ class Cart extends Component {
             )
           }
           </div>
-          <div className="checkout">
-            {/* <Checkout total={this.state.myTotal} /> */}
-          </div>
-          </div>
-          <div id="promoDiv">
+          <div>
           <PromoCode handlePromoSubmit={this.handlePromoSubmit} promoCode={this.state.promoCode} />
-          <div id="displayTotal">
-            <span>Total: ${this.state.myTotal}</span>
           </div>
-          <Link to={{ pathname: '/checkout', state: {total: this.state.myTotal}}}><button id="checkoutBtn" type='submit' onSubmit={this.handleSubmit}>Checkout</button></Link>
-
-
+          <div>
+            <Link to={{ pathname: '/checkout', state: {total: this.state.myTotal}}}><button type='submit' onSubmit={this.handleSubmit}>Checkout</button></Link>
           </div>
         </div>
       )
