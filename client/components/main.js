@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
-import {Link} from 'react-router-dom'
+// import {Link} from 'react-router-dom'
 import { gotAllProducts } from '../store/product'
 import SingleProduct from './singleProduct'
 import { gotAllOrders, postToCart } from '../store/order'
@@ -14,6 +14,7 @@ class Main extends Component {
     })
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this)
+
   }
 
   async componentDidMount(){
@@ -54,9 +55,14 @@ class Main extends Component {
 
   handleSubmit(evt){
     //add to cart with given quantity
+    console.log('handleSubmit')
+    console.log('selectedProd', this.props.selectedProduct)
     evt.preventDefault();
 
-    const productId = Number(evt.target.name);
+    // const productId = Number(evt.target.name);
+    const productId = Number(this.props.selectedProduct.id);
+    // console.log('productIS', evt.target.name)
+
     const [ selectedProductInLocalState ] = this.state.orderProduct.filter(product => product.id === productId);
     const quantity = selectedProductInLocalState.quantity
 
@@ -105,11 +111,19 @@ class Main extends Component {
     return (
           <div>
             <main>
+              <div id="hero">
+                <span className="promo-code">FOUR SEASONS SALE</span>
+                <span id="promo-2"><strong>50%</strong> off with code <strong>SCENTEDSHOPPER</strong></span>
+              </div>
+              <div id="banner">
+                <span id="message"> Shop all scents</span>
+              </div>
               <div id='products' className='row wrap'>
                     {
                         this.state.orderProduct &&
                         this.state.orderProduct.map(orderProduct => {
                             return (
+
                                 <SingleProduct
                                   key={orderProduct.id}
                                   isAdmin={this.props.isAdmin}
@@ -132,7 +146,8 @@ const mapStateToProps = (state) => {
     products: state.product,
     order: state.order,
     user: state.user,
-    isAdmin: state.user.isAdmin
+    isAdmin: state.user.isAdmin,
+    selectedProduct: state.selectedProduct
   }
 }
 
